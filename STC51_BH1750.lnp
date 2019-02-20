@@ -1,0 +1,11 @@
+"STARTUP.obj",
+"STC_BH1750.obj",
+"12864.obj",
+"main.obj",
+"GPES.obj",
+"DHT11.obj",
+"send_all.obj",
+"key.obj",
+"start.obj",
+"tu.obj" 
+TO "STC51_BH1750" 

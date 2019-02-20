@@ -1,0 +1,222 @@
+C51 COMPILER V9.00   DHT11                                                                 05/06/2017 12:02:08 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE DHT11
+OBJECT MODULE PLACED IN DHT11.OBJ
+COMPILER INVOKED BY: D:\安装包2\keil4\C51\BIN\C51.EXE DHT11.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<DHT11.h>
+   2          
+   3          sbit  P2_0  = P1^2 ;
+   4          
+   5          
+   6          
+   7          typedef unsigned char  U8;       /* defined for unsigned 8-bits integer variable          无符号8位整型变量  */
+   8          // typedef unsigned int   U16;      /* defined for unsigned 16-bits integer variable      无符号16位整型变量
+             - */
+   9           U8  U8FLAG;
+  10          U8  U8count,U8temp;
+  11          U8  U8T_data_H,U8T_data_L,U8RH_data_H,U8RH_data_L,U8checkdata;
+  12          U8  U8T_data_H_temp,U8T_data_L_temp,U8RH_data_H_temp,U8RH_data_L_temp,U8checkdata_temp;
+  13          U8  U8comdata; 
+  14          unsigned char shidu_shi,shidu_ge,wendu_shi,wendu_ge;
+  15          
+  16          void Delay18ms()                //@11.0592MHz
+  17          {
+  18   1              unsigned char i, j, k;
+  19   1              _nop_();
+  20   1              _nop_();
+  21   1              i = 1;
+  22   1              j = 194;
+  23   1              k = 159;
+  24   1              do
+  25   1              {
+  26   2                      do
+  27   2                      {
+  28   3                              while (--k);
+  29   3                      } while (--j);
+  30   2              } 
+  31   1              while (--i);
+  32   1      }
+  33          
+  34           void  Delay_10us(void)
+  35                {
+  36   1              U8 i;
+  37   1              i--;
+  38   1              i--;
+  39   1              i--;
+  40   1              i--;
+  41   1              i--;
+  42   1              i--;
+  43   1             }
+  44          void DelayUs2x(unsigned char t)
+  45          {   
+  46   1       while(--t);
+  47   1      }
+  48          
+  49          
+  50          void DelayMs(unsigned char t)
+  51          {
+  52   1           
+  53   1       while(t--)
+  54   1       {
+C51 COMPILER V9.00   DHT11                                                                 05/06/2017 12:02:08 PAGE 2   
+
+  55   2           //大致延时1mS
+  56   2           DelayUs2x(245);
+  57   2               DelayUs2x(245);
+  58   2       }
+  59   1      }
+  60                  
+  61            void  COM()
+  62                {
+  63   1           
+  64   1                      U8 i;
+  65   1                
+  66   1             for(i=0;i<8;i++)    
+  67   1                  {
+  68   2                      
+  69   2                          U8FLAG=2;   
+  70   2                      while((!P2_0)&&U8FLAG++);
+  71   2      
+  72   2      Delay_10us();
+  73   2      Delay_10us();
+  74   2      Delay_10us();
+  75   2                              U8temp=0;
+  76   2                   if(P2_0)U8temp=1;
+  77   2                          U8FLAG=2;
+  78   2                       while((P2_0)&&U8FLAG++);
+  79   2                      //超时则跳出for循环               
+  80   2                       if(U8FLAG==1)break;
+  81   2                      //判断数据位是0还是1     
+  82   2                         
+  83   2                      // 如果高电平高过预定0高电平值则数据位为 1 
+  84   2                       
+  85   2                         U8comdata<<=1;
+  86   2                         U8comdata|=U8temp;    
+  87   2                   }
+  88   1                 
+  89   1              }
+  90          
+  91                  //--------------------------------
+  92                  //-----湿度读取子程序 ------------
+  93                  //--------------------------------
+  94                  //----以下变量均为全局变量--------
+  95                  //----温度高8位== U8T_data_H------
+  96                  //----温度低8位== U8T_data_L------
+  97                  //----湿度高8位== U8RH_data_H-----
+  98                  //----湿度低8位== U8RH_data_L-----
+  99                  //----校验 8位 == U8checkdata-----
+ 100                  //----调用相关子程序如下----------
+ 101                  //---- Delay();, Delay_10us();,COM(); 
+ 102                  //--------------------------------
+ 103          
+ 104                  void RH()
+ 105                  {
+ 106   1                //主机拉低18ms 
+ 107   1             P2_0=0;    
+ 108   1                DelayMs(18);                  //延时180ms
+ 109   1                 P2_0=1;
+ 110   1      
+ 111   1             Delay_10us();
+ 112   1                 Delay_10us();
+ 113   1                 Delay_10us();
+ 114   1                 Delay_10us();
+ 115   1      
+ 116   1               //主机设为输入 判断从机响应信号 
+C51 COMPILER V9.00   DHT11                                                                 05/06/2017 12:02:08 PAGE 3   
+
+ 117   1                 P2_0=1;
+ 118   1               //判断从机是否有低电平响应信号 如不响应则跳出，响应则向下运行    
+ 119   1                 if(!P2_0)             //T !    
+ 120   1                 {
+ 121   2                 U8FLAG=2;
+ 122   2               //判断从机是否发出 80us 的低电平响应信号是否结束        
+ 123   2                 while((!P2_0)&&U8FLAG++);
+ 124   2                 U8FLAG=2;
+ 125   2               //判断从机是否发出 80us 的高电平，如发出则进入数据接收状态
+ 126   2                 while((P2_0)&&U8FLAG++);
+ 127   2               //数据接收状态          
+ 128   2                 COM();
+ 129   2                 U8RH_data_H_temp=U8comdata;
+ 130   2                 COM();
+ 131   2                 U8RH_data_L_temp=U8comdata;
+ 132   2                 COM();
+ 133   2                 U8T_data_H_temp=U8comdata;
+ 134   2                 COM();
+ 135   2                 U8T_data_L_temp=U8comdata;
+ 136   2                 COM();
+ 137   2                 U8checkdata_temp=U8comdata;
+ 138   2                 P2_0=1;
+ 139   2               //数据校验 
+ 140   2               
+ 141   2                 U8temp=(U8T_data_H_temp+U8T_data_L_temp+U8RH_data_H_temp+U8RH_data_L_temp);
+ 142   2                 if(U8temp==U8checkdata_temp)
+ 143   2                 {
+ 144   3                        U8RH_data_H=U8RH_data_H_temp;
+ 145   3                        U8RH_data_L=U8RH_data_L_temp;
+ 146   3                        U8T_data_H=U8T_data_H_temp;
+ 147   3                        U8T_data_L=U8T_data_L_temp;
+ 148   3                        U8checkdata=U8checkdata_temp;
+ 149   3                 }
+ 150   2                 }
+ 151   1      
+ 152   1              }
+ 153            void DHT11_Display()
+ 154          {
+ 155   1      
+ 156   1              RH();
+ 157   1              shidu_shi=0x30+U8RH_data_H/10; 
+ 158   1              shidu_ge=0x30+U8RH_data_H%10; 
+ 159   1              wendu_shi=0x30+U8T_data_H/10; 
+ 160   1              wendu_ge=0x30+U8T_data_H%10; 
+ 161   1      
+ 162   1              write_cmd(0x90);
+ 163   1              write_word("空气湿度");
+ 164   1              write_cmd(0x90+5);
+ 165   1              write_date(shidu_shi);
+ 166   1      //      write_cmd(0x90+6);
+ 167   1              write_date(shidu_ge);
+ 168   1      //       write_cmd(0x90+7);
+ 169   1              write_word("%");
+ 170   1              write_cmd(0x88);
+ 171   1              write_word("空气温度");
+ 172   1              write_cmd(0x88+5);
+ 173   1              write_date(wendu_shi);
+ 174   1      //      write_cmd(0x88+6);
+ 175   1              write_date(wendu_ge);
+ 176   1       //   write_cmd(0x88+7);
+ 177   1              write_word("C");
+ 178   1      
+C51 COMPILER V9.00   DHT11                                                                 05/06/2017 12:02:08 PAGE 4   
+
+ 179   1      }
+ 180          void gprs_senDHT11()
+ 181          {
+ 182   1              Uart1Send(wendu_shi);            //空气温度十位
+ 183   1              Uart1Send(wendu_ge);                 //空气温度个位
+ 184   1              Uart1Send(shidu_shi);            //空气湿度十位
+ 185   1              Uart1Send(shidu_ge);                 //空气湿度个位
+ 186   1      
+ 187   1      
+ 188   1      }
+ 189          
+ 190          
+ 191          
+ 192                  
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    375    ----
+   CONSTANT SIZE    =     22    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     18       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

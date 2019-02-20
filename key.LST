@@ -1,0 +1,71 @@
+C51 COMPILER V9.00   KEY                                                                   05/06/2017 12:02:09 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN key.OBJ
+COMPILER INVOKED BY: D:\°²×°°ü2\keil4\C51\BIN\C51.EXE key.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<key.h>
+   2          
+   3          sbit key1=P1^5;
+   4          sbit key2=P1^6;
+   5          
+   6           unsigned char flag=0;
+   7          
+   8          void key()
+   9          {
+  10   1      if(key1==0)
+  11   1              {
+  12   2                       delay(3);
+  13   2                      if(key1==0)
+  14   2                      {
+  15   3                              while(key1==0);
+  16   3                              {
+  17   4                                      flag++;
+  18   4                                      ClrScreen();
+  19   4                                      if(flag==2)
+  20   4                                      {
+  21   5                                              flag=0;
+  22   5                                      }
+  23   4                              }
+  24   3                      }
+  25   2              }
+  26   1      //      if(key2==0)
+  27   1      //      {       
+  28   1      //              delay(3);
+  29   1      //              if(key2==0)
+  30   1      //              {
+  31   1      //                      while(!key2);
+  32   1      //                      send_all();
+  33   1      //              }
+  34   1      //      }
+  35   1      }
+  36          void key_display()
+  37          {                                       
+  38   1              switch(flag)
+  39   1              {                
+  40   2      
+  41   2                      case 0: start_display();break;
+  42   2                      case 1: all_Display();break;
+  43   2                      default:break;
+  44   2              }       
+  45   1      }
+  46             
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     45    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.00   KEY                                                                   05/06/2017 12:02:09 PAGE 2   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
